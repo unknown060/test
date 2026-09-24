@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>單位單價快速比價</title>
+  <!-- 引入 Tailwind CSS 快速美化 UI -->
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 p-4 max-w-md mx-auto font-sans">
+
+  <h1 class="text-xl font-bold text-center mb-4 text-gray-800">⚡ 單位單價快速比價</h1>
+
+  <div class="space-y-4">
+    <!-- 商品 A -->
+    <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-200">
+      <h2 class="font-bold text-gray-700 mb-2">商品 A</h2>
+      <div class="grid grid-cols-2 gap-2 mb-3">
+        <div>
+          <label class="text-xs text-gray-500">容量/重量 (g/ml)</label>
+          <input type="number" id="sizeA" placeholder="例: 600" oninput="calculate()" class="w-full border p-2 rounded text-lg font-semibold focus:outline-none focus:ring-2 focus:ring-blue-500">
+        </div>
+        <div>
+          <label class="text-xs text-gray-500">價格 (元)</label>
+          <input type="number" id="priceA" placeholder="例: 1429" oninput="calculate()" class="w-full border p-2 rounded text-lg font-semibold focus:outline-none focus:ring-2 focus:ring-blue-500">
+        </div>
+      </div>
+      <div class="text-sm space-y-1 bg-gray-50 p-2 rounded">
+        <div>1 g / ml = <span id="unitA" class="font-bold text-blue-600">-</span> 元</div>
+        <div class="text-xs text-gray-500">100 g/ml = <span id="unit100A">-</span> 元 | 1 mg = <span id="unitMgA">-</span> 元</div>
+      </div>
+    </div>
+
+    <!-- 商品 B -->
+    <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-200">
+      <h2 class="font-bold text-gray-700 mb-2">商品 B</h2>
+      <div class="grid grid-cols-2 gap-2 mb-3">
+        <div>
+          <label class="text-xs text-gray-500">容量/重量 (g/ml)</label>
+          <input type="number" id="sizeB" placeholder="例: 370" oninput="calculate()" class="w-full border p-2 rounded text-lg font-semibold focus:outline-none focus:ring-2 focus:ring-blue-500">
+        </div>
+        <div>
+          <label class="text-xs text-gray-500">價格 (元)</label>
+          <input type="number" id="priceB" placeholder="例: 600" oninput="calculate()" class="w-full border p-2 rounded text-lg font-semibold focus:outline-none focus:ring-2 focus:ring-blue-500">
+        </div>
+      </div>
+      <div class="text-sm space-y-1 bg-gray-50 p-2 rounded">
+        <div>1 g / ml = <span id="unitB" class="font-bold text-blue-600">-</span> 元</div>
+        <div class="text-xs text-gray-500">100 g/ml = <span id="unit100B">-</span> 元 | 1 mg = <span id="unitMgB">-</span> 元</div>
+      </div>
+    </div>
+
+    <!-- 比較結果提示 -->
+    <div id="resultBanner" class="p-3 rounded-xl text-center font-bold text-white hidden"></div>
+  </div>
+
+  <script>
+    function calculate() {
+      const sizeA = parseFloat(document.getElementById('sizeA').value);
+      const priceA = parseFloat(document.getElementById('priceA').value);
+      const sizeB = parseFloat(document.getElementById('sizeB').value);
+      const priceB = parseFloat(document.getElementById('priceB').value);
+
+      let unitPriceA = null, unitPriceB = null;
+
+      if (sizeA > 0 && priceA >= 0) {
+        unitPriceA = priceA / sizeA;
+        document.getElementById('unitA').innerText = unitPriceA.toFixed(3);
+        document.getElementById('unit100A').innerText = (unitPriceA * 100).toFixed(1);
+        document.getElementById('unitMgA').innerText = (unitPriceA / 1000).toFixed(5);
+      } else {
+        document.getElementById('unitA').innerText = '-';
+        document.getElementById('unit100A').innerText = '-';
+        document.getElementById('unitMgA').innerText = '-';
+      }
+
+      if (sizeB > 0 && priceB >= 0) {
+        unitPriceB = priceB / sizeB;
+        document.getElementById('unitB').innerText = unitPriceB.toFixed(3);
+        document.getElementById('unit100B').innerText = (unitPriceB * 100).toFixed(1);
+        document.getElementById('unitMgB').innerText = (unitPriceB / 1000).toFixed(5);
+      } else {
+        document.getElementById('unitB').innerText = '-';
+        document.getElementById('unit100B').innerText = '-';
+        document.getElementById('unitMgB').innerText = '-';
+      }
+
+      // 比較高下
+      const banner = document.getElementById('resultBanner');
+      if (unitPriceA !== null && unitPriceB !== null) {
+        banner.classList.remove('hidden', 'bg-green-600', 'bg-blue-600', 'bg-gray-500');
+        if (unitPriceA < unitPriceB) {
+          const diff = (((unitPriceB - unitPriceA) / unitPriceB) * 100).toFixed(1);
+          banner.innerText = `🎉 商品 A 比較划算！（省下約 ${diff}%）`;
+          banner.classList.add('bg-green-600');
+        } else if (unitPriceB < unitPriceA) {
+          const diff = (((unitPriceA - unitPriceB) / unitPriceA) * 100).toFixed(1);
+          banner.innerText = `🎉 商品 B 比較划算！（省下約 ${diff}%）`;
+          banner.classList.add('bg-green-600');
+        } else {
+          banner.innerText = '⚖️ 兩者單價完全相同！';
+          banner.classList.add('bg-gray-500');
+        }
+      } else {
+        banner.classList.add('hidden');
+      }
+    }
+  </script>
+</body>
+</html>
